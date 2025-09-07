@@ -115,7 +115,7 @@ def save_output(file_path, content, url, mode, time_out):
 
 
 def text_dump(soup):
-    print("\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Text..")
+    print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Text..")
     result = []
     try:
         full_text = soup.get_text(separator="\n", strip=True)
@@ -127,7 +127,7 @@ def text_dump(soup):
         print(f"  [{fore_colors['red']}!{fore_colors['reset']}] {e}")
     
 def link_dump(soup):
-    print("\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Links..")
+    print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Links..")
     result = []
     try:
         for a in soup.find_all("a", href=True):
@@ -138,7 +138,7 @@ def link_dump(soup):
         print(f"  [{fore_colors['red']}!{fore_colors['reset']}] {e}")
 
 def img_dump(soup):
-    print("\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Images..")
+    print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Images..")
     result = []
     try:
         for img in soup.find_all("img", src=True):
@@ -150,7 +150,7 @@ def img_dump(soup):
 
 def dump_all(url, time_outt, mode):
     try:
-        print("  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Start Dumping..")
+        print(f"  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Start Dumping..")
 
         response = requests.get(url, timeout=time_outt)
         response.raise_for_status()
