@@ -1,1 +1,2 @@
 # PirateLoot
+![Pirate Loot](https://cdn.discordapp.com/attachments/1393114345206190111/1414272755460739235/IMG_20250907_223214.jpg?ex=68bef7a4&is=68bda624&hm=717b81197285a1756fc144cafe3413780c352e274caf7ae0de962a1d74246e63&)
