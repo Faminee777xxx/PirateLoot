@@ -174,7 +174,7 @@ def dump_all(url, time_outt, mode):
 def show_banner():
     random_banner = random.choice(baner_list)
     print(random_banner)
-    print("  Github: https://github.com/Faminee777xxx")
+    print("  Github: https://github.com/Faminee777xxx/PirateLoot")
     print("  Version: 1.0\n")
     
 
