@@ -2,8 +2,7 @@
 ![Pirate Loot](https://cdn.discordapp.com/attachments/1393114345206190111/1414272755460739235/IMG_20250907_223214.jpg?ex=68bef7a4&is=68bda624&hm=717b81197285a1756fc144cafe3413780c352e274caf7ae0de962a1d74246e63&)
 
 
-# PirateLoot 🏴‍☠️
-
+# PirateLoot 🏴‍☠️  # Version 2.0
 **PirateLoot** เป็นสคริปต์ Python (web scraping) — ดึงข้อความ, ลิงก์ และรูปภาพ จากหน้าเว็บเป้าหมายแล้วเซฟลงโฟลเดอร์ `Output/`
 
 ---
@@ -24,7 +23,6 @@ PirateLoot is a small Python web-scraper that extracts page text, links, and ima
 ---
 
 ## 🛠️ ความต้องการระบบ / Requirements
-- Python 3.8+  
 - โมดูล Python (รายชื่อใน `requirements.txt` ด้านล่าง)
 
 ---
