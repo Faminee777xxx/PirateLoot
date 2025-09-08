@@ -54,10 +54,11 @@ import random
 import requests
 import argparse
 import time
-
+from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
-
+from datetime import datetime
 from colorama import Fore, Back, Style
+
 fore_colors = {
 	"black": Fore.BLACK,
 	"red": Fore.RED,
@@ -89,13 +90,16 @@ styles = {
 	"reset": Style.RESET_ALL
 }
 
-DUMP_LIST = ["pic", "text", "link"]
-
 def datet():
-    from datetime import datetime
-    return datetime.today().date()
+    return datetime.now().strftime("%Y%m%d-%H%M%S")
 
-def save_output(file_path, content, url, mode, time_out):
+
+def domain(url):
+    parsed = urlparse(url)
+    return parsed.netloc or parsed.path.split("/")[0]
+    
+
+def save_output(file_path, content, url, time_out):
 
     
     folder_output = "Output"
@@ -108,10 +112,11 @@ def save_output(file_path, content, url, mode, time_out):
     out = f"{folder_output}/{file_path}_{datet()}.txt"
     try:
         with open(out, 'w', encoding='utf-8') as f:
-            f.write(f"{show_info(url, mode, time_out)}{datet()}\n\n\n{content}")
+            f.write(f"{show_info(url, time_out)}\n\n\n{content}")
         print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['green']}${fore_colors['reset']}] Saved: {out}")
     except Exception as e:
         print(f"  [{fore_colors['red']}!{fore_colors['reset']}] Error: {e}")
+
 
 
 def text_dump(soup):
@@ -127,7 +132,7 @@ def text_dump(soup):
         print(f"  [{fore_colors['red']}!{fore_colors['reset']}] {e}")
     
 def link_dump(soup):
-    print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Links..")
+    print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Link..")
     result = []
     try:
         for a in soup.find_all("a", href=True):
@@ -137,18 +142,54 @@ def link_dump(soup):
     except Exception as e:
         print(f"  [{fore_colors['red']}!{fore_colors['reset']}] {e}")
 
-def img_dump(soup):
-    print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Images..")
+
+def download_img(url):
+    folder_path = domain(url)
+    full_folder = f"Output/{folder_path}/Img"
+    os.makedirs(full_folder, exist_ok=True)
+
+    file_name = url.split("/")[-1]
+    save_path = os.path.join(full_folder, file_name)
+
+    try:
+        r = requests.get(url, stream=True)
+        r.raise_for_status()
+
+        with open(save_path, "wb") as f:
+            for chunk in r.iter_content(1024):
+                f.write(chunk)
+
+        print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}$${fore_colors['reset']}] Loot acquired! Saved: {styles['bright']}{save_path}{styles['reset']}")
+
+    except Exception as e:
+        print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['red']}!{fore_colors['reset']}] Failed to loot Image{url} → {e}")
+
+
+def img_dump(soup, base_url, save_img):
+
+    print(f"\n  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Dumping Image..")
     result = []
     try:
         for img in soup.find_all("img", src=True):
-            print("  -", img["src"])
-            result.append(img["src"])
+            img_url = img["src"]
+
+            # relative path → absolute URL
+            full_url = urljoin(base_url, img_url)
+
+            print("  -", full_url)
+            if save_img == True:
+
+                download_img(full_url)
+            result.append(full_url)
+
         return "\n".join(result)
     except Exception as e:
-        print(f"  [{fore_colors['blue']}INFO{fore_colors['reset']}] {e}")
+        print(f"  [{fore_colors['red']}!{fore_colors['reset']}] {e}")
 
-def dump_all(url, time_outt, mode):
+
+
+
+def dump_all(url, time_outt, time_sleep, s_or_n):
     try:
         print(f"  [{fore_colors['blue']}INFO{fore_colors['reset']}]-[{fore_colors['yellow']}${fore_colors['reset']}] Start Dumping..")
 
@@ -157,51 +198,51 @@ def dump_all(url, time_outt, mode):
         soup = BeautifulSoup(response.content, "html.parser")
 
         con_1 = text_dump(soup)
-        time.sleep(2)
+        time.sleep(time_sleep)
         con_2 = link_dump(soup)
-        time.sleep(2)
-        con_3 = img_dump(soup)
-        time.sleep(2)
+        time.sleep(time_sleep)
+        con_3 = img_dump(soup, url, s_or_n)
+        time.sleep(time_sleep)
 
-        contentt = f"{con_1}\n{con_2}\n{con_3}"
+        contentt = f"[TEXT]\n{con_1}\n\n[LINKS]\n{con_2}\n\n[IMAGES]\n{con_3}"
 
-        domain = url.split("://")[1].split("/")[0]
-        save_output(domain, contentt, url, mode, time_outt)
+        clean = domain(url)
+        save_output(clean, contentt, url, time_outt)
+
     except Exception as e:
         print(f"  [{fore_colors['red']}!{fore_colors['reset']}] Error while looting: {e}")
+
+
 
 
 def show_banner():
     random_banner = random.choice(baner_list)
     print(random_banner)
-    print("  Github: https://github.com/Faminee777xxx/PirateLoot")
-    print("  Version: 1.0\n")
+    print(f"  Github : {fore_colors['green']}https://github.com/Faminee777xxx/PirateLoot{fore_colors['reset']}")
+    print(f"  Version: {fore_colors['green']}2.0{fore_colors['reset']}\n")
     
 
 def show_help_menu():
     print(r"""
 Options:
-|-----------------------------------------------------
+|----------------------------------------------------|
 | -h                : Show Help Menu                 |
 | -v, --version     : Show Version's tool            |
 | -u, --url         : Target URL                     |
 | -to, --time-out   : Time out          (default: 10)|
-|-----------------------------------------------------
-|+ Mode +                                            |
-|-\ --dump-all      : Dump Everythings on url        |
-|-\ --dump          : Dump only topics(Not Done yet) |
-|                                                    |
-|-----------------------------------------------------
+| -f, --fast        : Fast Mode                      |
+| +Save                                              |
+| -\ --save-img     : Save img as a file             |
+|----------------------------------------------------|
 """)
 
-def show_info(url, mode, time_out):
+def show_info(url, time_out):
     return f"""
-  [{fore_colors['blue']}INFO{fore_colors['reset']}]
+  [INFO]
     +----------------------------------+
     -Target Url  : {url}
+    -Date        : {datet()}
     -Time out    : {time_out}
-    +-Mode
-        -| {mode}
     +----------------------------------+
     """
 
@@ -209,13 +250,15 @@ def show_info(url, mode, time_out):
 
 # Main
 def main():
-    parser = argparse.ArgumentParser(description=show_banner(), add_help=False)
-    parser.add_argument("--help-menu", required=False, action='store_true', dest="help_menu", help="Help Menu")
+    parser = argparse.ArgumentParser(description="PirateLoot!", add_help=False)
+    parser.add_argument("-help", "--help-menu", required=False, action='store_true', dest="help_menu", help="Help Menu")
     parser.add_argument("-u", "--url", required=True, type=str, help="Target URL")
     parser.add_argument("-v","--version", action="version", version="==PirateLoot 1.0")
 
-    # Dump
-    parser.add_argument("--dump-all", required=True, action='store_true', default=False, help="Dump Everything on url page")
+    parser.add_argument("--fast", "-f", required=False, action='store_true', help="Faster!")
+
+    # Dump img
+    parser.add_argument("--save-img", required=False, action='store_true', help="Save img in webpage")
 
     # Time Out
     parser.add_argument("-to", "--time-out", required=False, default=10, type=int, help="Enter Time out (default: 10)")
@@ -223,13 +266,13 @@ def main():
     ar = parser.parse_args()
     help_menu = ar.help_menu
     target_url = ar.url
-    dump_a = ar.dump_all
+
     time_out = ar.time_out
 
-    if time_out:
-        pass
+    if ar.fast:
+        time_out = 5
     else:
-        time_out = 10
+        time_out = ar.time_out
 
     # Check
     if help_menu:
@@ -239,27 +282,26 @@ def main():
         pass
     
 
-    # Mode Checker
-    if dump_a:
-        mode = "Dump All"
-
-    else:
-        print(f"  [{fore_colors['red']}!{fore_colors['reset']}] Can't do anything T_T")
-        time.sleep(2)
-        print(f"  [{fore_colors['red']}!{fore_colors['reset']}] Please Use option (--dump-all or --dump)")
-        sys.exit(0)
-    
-
         
-    show_info(target_url, mode, time_out)
+    print(show_info(target_url, time_out))
     print(f"  [{fore_colors['blue']}INFO{fore_colors['reset']}] {styles['bright']}Time to Dump!{styles['reset']}")
 
+    if ar.fast:
+        time_sleep = 0.5
+    else:
+        time_sleep = 2
+
+    if ar.save_img:
+        save_img_or_not = True
+    else:
+        save_img_or_not = False
     
-    time.sleep(3)
+
+    time.sleep(time_sleep)
     looting()
-    time.sleep(2)
-    if dump_a:
-        dump_all(target_url, time_out, mode)
+    time.sleep(time_sleep)
+    
+    dump_all(target_url, time_out, time_sleep, save_img_or_not)
 
 
 if __name__ == "__main__":
