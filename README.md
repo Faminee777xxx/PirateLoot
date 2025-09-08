@@ -13,15 +13,6 @@ PirateLoot is a small Python web-scraper that extracts page text, links, and ima
 ---
 
 ## 🧭 ฟีเจอร์ / Features
-Options:
-+----------------------------------------------------+
-| -h                : Show Help Menu                 |
-| -v, --version     : Show Version's tool            |
-| -u, --url         : Target URL                     |
-| -to, --time-out   : Time out (default: 10)         |
-| -f, --fast        : Fast Mode                      |
-| --save-img        : Save img as a file             |
-+----------------------------------------------------+
 
 ---
 
