@@ -282,7 +282,7 @@ def main():
         pass
     
 
-        
+    show_banner()    
     print(show_info(target_url, time_out))
     print(f"  [{fore_colors['blue']}INFO{fore_colors['reset']}] {styles['bright']}Time to Dump!{styles['reset']}")
 
