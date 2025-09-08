@@ -31,4 +31,7 @@ PirateLoot is a small Python web-scraper that extracts page text, links, and ima
 
 ---
 
-## 📦 requirements.txt
+## การใช้งาน
+`python pirateloot.py -u "https://example.com"`
+
+## Done!
